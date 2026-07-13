@@ -208,12 +208,12 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
   }
 
   // 3. Resolve Author
-  let authorUrn = '';
+  let authorUrn = process.env.LINKEDIN_AUTHOR_URN || '';
   let brandName = process.env.BANNER_BRAND || 'Karishma';
 
   if (orgId) {
     authorUrn = `urn:li:organization:${orgId}`;
-  } else if (token) {
+  } else if (!authorUrn && token) {
     try {
       console.log('Resolving LinkedIn author profile...');
       const userinfoRes = await fetch('https://api.linkedin.com/v2/userinfo', {
@@ -227,12 +227,28 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
         if (!process.env.BANNER_BRAND && userInfo.name) {
           brandName = userInfo.name;
         }
-        console.log(`Resolved Author URN: ${authorUrn} (Name: ${brandName})`);
+        console.log(`Resolved Author URN via /v2/userinfo: ${authorUrn} (Name: ${brandName})`);
       } else {
-        console.warn(`Warning: Could not fetch user profile info: ${userinfoRes.status} ${userinfoRes.statusText}. Using fallback details.`);
+        console.warn(`Warning: Could not fetch /v2/userinfo: ${userinfoRes.status} ${userinfoRes.statusText}. Trying /v2/me fallback...`);
+        const meRes = await fetch('https://api.linkedin.com/v2/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (meRes.ok) {
+          const meInfo = await meRes.json();
+          authorUrn = `urn:li:person:${meInfo.id}`;
+          const resolvedName = `${meInfo.localizedFirstName || ''} ${meInfo.localizedLastName || ''}`.trim();
+          if (!process.env.BANNER_BRAND && resolvedName) {
+            brandName = resolvedName;
+          }
+          console.log(`Resolved Author URN via /v2/me: ${authorUrn} (Name: ${brandName})`);
+        } else {
+          console.warn(`Warning: Could not fetch /v2/me: ${meRes.status} ${meRes.statusText}.`);
+        }
       }
     } catch (err) {
-      console.warn(`Warning: Failed to fetch LinkedIn profile: ${err.message}. Using fallback details.`);
+      console.warn(`Warning: Failed to fetch LinkedIn profile: ${err.message}.`);
     }
   }
 
