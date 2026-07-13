@@ -216,7 +216,7 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
     const displayEnd = authorUrn.substring(Math.max(0, authorUrn.length - 4));
     console.log(`LINKEDIN_AUTHOR_URN input length: ${authorUrn.length} (Starts with: "${displayStart}", Ends with: "${displayEnd}")`);
 
-    if (/^\d+$/.test(authorUrn)) {
+    if (/^[a-zA-Z0-9_-]+$/.test(authorUrn)) {
       authorUrn = `urn:li:person:${authorUrn}`;
     } else if (authorUrn.startsWith('urn:li:member:')) {
       authorUrn = authorUrn.replace('urn:li:member:', 'urn:li:person:');
