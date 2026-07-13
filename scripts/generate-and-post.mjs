@@ -68,10 +68,10 @@ async function main() {
   const apiKey = process.env.GEMINI_API_KEY;
   const token = process.env.LINKEDIN_ACCESS_TOKEN;
   const orgId = process.env.LINKEDIN_ORGANIZATION_ID;
-  let model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
-  if (model === 'gemini-2.5-flash') {
-    console.log('Model gemini-2.5-flash is deprecated. Auto-routing to gemini-1.5-flash.');
-    model = 'gemini-1.5-flash';
+  let model = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+  if (model === 'gemini-2.5-flash' || model === 'gemini-1.5-flash') {
+    console.log(`Model ${model} is not supported. Auto-routing to gemini-2.0-flash.`);
+    model = 'gemini-2.0-flash';
   }
   const includeBanner = process.env.INCLUDE_BANNER !== 'false';
 
