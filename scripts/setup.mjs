@@ -207,7 +207,7 @@ async function main() {
   // Write .env
   console.log('\nWriting config to .env...');
   const envContent = `GEMINI_API_KEY=${geminiKey}
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-1.5-flash
 
 # LinkedIn API Config
 LINKEDIN_ACCESS_TOKEN=${linkedinToken}
