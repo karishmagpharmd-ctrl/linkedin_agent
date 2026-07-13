@@ -9,8 +9,6 @@ export async function uploadImageToLinkedIn({ token, ownerUrn, imageBuffer }) {
     registerUploadRequest: {
       recipes: ['urn:li:digitalmediaRecipe:feedshare-image'],
       owner: ownerUrn,
-      supportedUploadMechanisms: ['SYNCHRONOUS_UPLOAD'],
-      relationshipType: 'OWNER',
       serviceRelationships: [
         {
           relationshipType: 'OWNER',
