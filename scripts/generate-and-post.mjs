@@ -68,7 +68,7 @@ async function main() {
   const apiKey = process.env.GEMINI_API_KEY;
   const token = process.env.LINKEDIN_ACCESS_TOKEN;
   const orgId = process.env.LINKEDIN_ORGANIZATION_ID;
-  const model = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+  const model = process.env.GEMINI_MODEL || 'gemini-1.5-flash';
   const includeBanner = process.env.INCLUDE_BANNER !== 'false';
 
   console.log(`Running in ${isDryRun ? 'DRY-RUN (preview)' : 'PRODUCTION'} mode.`);
