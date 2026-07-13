@@ -143,49 +143,67 @@ Chosen Angle: "${chosenAngle}"
 
 Output ONLY the final LinkedIn post text. Do not include any tags, preambles, explanations, or quotes.`;
 
-  const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  const payload = {
-    contents: [
-      {
-        parts: [
-          {
-            text: systemInstruction
-          }
-        ]
-      }
-    ],
-    generationConfig: {
-      temperature: 1.1,
-      topP: 0.95
+  const modelsToTry = [model];
+  const fallbacks = ['gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
+  for (const f of fallbacks) {
+    if (!modelsToTry.includes(f)) {
+      modelsToTry.push(f);
     }
-  };
+  }
 
-  console.log('Generating content via Google Gemini API...');
   let postText = '';
-  try {
-    const geminiRes = await fetchWithBackoff(geminiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
+  let generationError = null;
 
-    if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      throw new Error(`Gemini API call failed: ${geminiRes.status} ${geminiRes.statusText} - ${errText}`);
-    }
+  for (const currentModel of modelsToTry) {
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent?key=${apiKey}`;
+    const payload = {
+      contents: [
+        {
+          parts: [
+            {
+              text: systemInstruction
+            }
+          ]
+        }
+      ],
+      generationConfig: {
+        temperature: 1.1,
+        topP: 0.95
+      }
+    };
 
-    const geminiData = await geminiRes.json();
-    postText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!postText) {
-      throw new Error(`Invalid response structure from Gemini API: ${JSON.stringify(geminiData)}`);
+    console.log(`Generating content via Google Gemini API using model "${currentModel}"...`);
+    try {
+      const geminiRes = await fetchWithBackoff(geminiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!geminiRes.ok) {
+        const errText = await geminiRes.text();
+        throw new Error(`Gemini API call failed: ${geminiRes.status} ${geminiRes.statusText} - ${errText}`);
+      }
+
+      const geminiData = await geminiRes.json();
+      postText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!postText) {
+        throw new Error(`Invalid response structure from Gemini API: ${JSON.stringify(geminiData)}`);
+      }
+      
+      postText = postText.trim();
+      generationError = null;
+      break; // Success! Exit model retry loop.
+    } catch (err) {
+      console.warn(`Warning: Generation failed with model "${currentModel}": ${err.message}`);
+      generationError = err;
     }
-    
-    // Trim extra spaces and format
-    postText = postText.trim();
-  } catch (err) {
-    console.error(`Gemini Generation Failed: ${err.message}`);
+  }
+
+  if (generationError) {
+    console.error(`Gemini Generation Failed after trying all fallback models: ${generationError.message}`);
     process.exit(1);
   }
 
