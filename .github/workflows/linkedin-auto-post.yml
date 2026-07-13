@@ -1,0 +1,80 @@
+name: LinkedIn Auto Poster
+
+on:
+  schedule:
+    - cron: '30 3 * * *' # 09:00 IST (03:30 UTC)
+  workflow_dispatch:
+    inputs:
+      topic:
+        description: 'Topic override (Format: Headline::Steering context)'
+        required: false
+        default: ''
+      repeat_count:
+        description: 'Number of posts to publish (for testing)'
+        required: false
+        default: '1'
+      repeat_delay_seconds:
+        description: 'Delay between multiple posts (seconds)'
+        required: false
+        default: '120'
+
+concurrency:
+  group: linkedin-auto-post
+  cancel-in-progress: false
+
+jobs:
+  auto-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Publish Post
+        run: |
+          # Read inputs with schedule fallbacks
+          COUNT="${{ github.event.inputs.repeat_count }}"
+          DELAY="${{ github.event.inputs.repeat_delay_seconds }}"
+          
+          if [ -z "$COUNT" ]; then COUNT=1; fi
+          if [ -z "$DELAY" ]; then DELAY=120; fi
+          
+          # Validate integers
+          if ! [[ "$COUNT" =~ ^[0-9]+$ ]]; then
+            echo "Error: repeat_count must be a non-negative integer"
+            exit 1
+          fi
+          if ! [[ "$DELAY" =~ ^[0-9]+$ ]]; then
+            echo "Error: repeat_delay_seconds must be a non-negative integer"
+            exit 1
+          fi
+          
+          echo "Executing post loop: $COUNT runs, $DELAYs delay"
+          for ((i=1; i<=COUNT; i++)); do
+            echo "==========================================="
+            echo "Starting Run $i/$COUNT"
+            echo "==========================================="
+            
+            node scripts/generate-and-post.mjs
+            
+            if [ $i -lt $COUNT ]; then
+              echo "Sleeping for $DELAY seconds..."
+              sleep $DELAY
+            fi
+          done
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          LINKEDIN_ACCESS_TOKEN: ${{ secrets.LINKEDIN_ACCESS_TOKEN }}
+          LINKEDIN_ORGANIZATION_ID: ${{ secrets.LINKEDIN_ORGANIZATION_ID }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-2.5-flash' }}
+          POST_TOPICS: ${{ github.event.inputs.topic }}
+          INCLUDE_BANNER: "true"
+          BANNER_BRAND: ${{ vars.BANNER_BRAND }}
