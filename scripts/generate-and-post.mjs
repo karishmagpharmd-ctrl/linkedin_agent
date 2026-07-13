@@ -144,7 +144,7 @@ Chosen Angle: "${chosenAngle}"
 Output ONLY the final LinkedIn post text. Do not include any tags, preambles, explanations, or quotes.`;
 
   const modelsToTry = [model];
-  const fallbacks = ['gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
+  const fallbacks = ['gemini-3.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest', 'gemini-2.5-pro', 'gemini-pro-latest'];
   for (const f of fallbacks) {
     if (!modelsToTry.includes(f)) {
       modelsToTry.push(f);
