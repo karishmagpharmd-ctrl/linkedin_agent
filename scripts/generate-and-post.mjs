@@ -216,14 +216,14 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
     const displayEnd = authorUrn.substring(Math.max(0, authorUrn.length - 4));
     console.log(`LINKEDIN_AUTHOR_URN input length: ${authorUrn.length} (Starts with: "${displayStart}", Ends with: "${displayEnd}")`);
 
-    if (/^[a-zA-Z0-9_-]+$/.test(authorUrn)) {
-      authorUrn = `urn:li:person:${authorUrn}`;
-    } else if (authorUrn.startsWith('urn:li:member:')) {
-      authorUrn = authorUrn.replace('urn:li:member:', 'urn:li:person:');
+    if (/^\d+$/.test(authorUrn)) {
+      authorUrn = `urn:li:member:${authorUrn}`;
+    } else if (authorUrn.startsWith('urn:li:person:')) {
+      authorUrn = authorUrn.replace('urn:li:person:', 'urn:li:member:');
     }
     
-    if (!authorUrn.startsWith('urn:li:person:') && !authorUrn.startsWith('urn:li:organization:')) {
-      console.warn(`Warning: LINKEDIN_AUTHOR_URN format is not valid. Ignoring it to use dynamic OIDC fallback resolution.`);
+    if (!authorUrn.startsWith('urn:li:member:') && !authorUrn.startsWith('urn:li:organization:')) {
+      console.warn(`Warning: LINKEDIN_AUTHOR_URN format is not valid (must resolve to "urn:li:member:<digits>" or "urn:li:organization:<digits>"). Ignoring it to use dynamic OIDC fallback resolution.`);
       authorUrn = '';
     } else {
       console.log(`Using configured Author URN: ${authorUrn}`);
@@ -270,6 +270,10 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
     } catch (err) {
       console.warn(`Warning: Failed to fetch LinkedIn profile: ${err.message}.`);
     }
+  }
+
+  if (authorUrn && authorUrn.startsWith('urn:li:person:')) {
+    authorUrn = authorUrn.replace('urn:li:person:', 'urn:li:member:');
   }
 
   if (!authorUrn && !isDryRun) {
