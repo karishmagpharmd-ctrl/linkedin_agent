@@ -1,0 +1,14 @@
+# Topics for LinkedIn posts. One topic per line.
+# Format: Headline::Optional steering context for Gemini
+# Only the text before :: will be printed on the banner.
+
+Why Instagram Reels fail to bring patients to clinics::explain why reels are for ego while local SEO and Google Business Profile drive real conversions
+The illusion of patient brand loyalty in Gen Z::how dermatologists lose patients if they rely on past reputation instead of modern visibility
+Premium clinic pricing vs volume discount trap::why plastic surgeons should target fewer patients at higher prices than chasing volume
+The clinical pharmacist's edge in product formulation::how understanding both chemistry and doctor-patient relationships makes a sunscreen brand scale
+Why collecting 5-star reviews is only 30% of clinic marketing::focus on what happens after the review—visibility, ranking, and website conversion
+Why your medical degree didn't teach you marketing::how doctors can build digital authority without spending all their time on social media
+The 60-70% rule of patient healing and expectation::why promising 100% resolution is a red flag in both clinical therapy and business marketing
+How to launch a skincare brand that sells at a premium::steps from formulation to packaging and positioning for high-margin success
+Digital marketing that speaks the language of science::why generic marketing agencies fail to connect with doctors and how to fix it
+Why you don't need a massive social media following to grow your clinic::explain how targeting specific procedure-based search queries converts better than viral content
