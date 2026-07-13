@@ -209,9 +209,20 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
 
   // 3. Resolve Author
   let authorUrn = process.env.LINKEDIN_AUTHOR_URN || '';
-  if (authorUrn && !authorUrn.startsWith('urn:li:')) {
-    console.warn(`Warning: LINKEDIN_AUTHOR_URN "${authorUrn}" is not a valid LinkedIn URN format (must start with "urn:li:person:" or "urn:li:organization:"). Ignoring it to use dynamic OIDC fallback resolution.`);
-    authorUrn = '';
+  if (authorUrn) {
+    authorUrn = authorUrn.trim();
+    if (/^\d+$/.test(authorUrn)) {
+      authorUrn = `urn:li:person:${authorUrn}`;
+    } else if (authorUrn.startsWith('urn:li:member:')) {
+      authorUrn = authorUrn.replace('urn:li:member:', 'urn:li:person:');
+    }
+    
+    if (!authorUrn.startsWith('urn:li:person:') && !authorUrn.startsWith('urn:li:organization:')) {
+      console.warn(`Warning: LINKEDIN_AUTHOR_URN format is not valid. Ignoring it to use dynamic OIDC fallback resolution.`);
+      authorUrn = '';
+    } else {
+      console.log(`Using configured Author URN: ${authorUrn}`);
+    }
   }
   let brandName = process.env.BANNER_BRAND || 'Karishma';
 
