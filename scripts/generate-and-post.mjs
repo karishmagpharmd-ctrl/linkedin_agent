@@ -211,6 +211,11 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
   let authorUrn = process.env.LINKEDIN_AUTHOR_URN || '';
   if (authorUrn) {
     authorUrn = authorUrn.trim();
+    // Print safe diagnostics to help user identify masking/copy-paste placeholder issues
+    const displayStart = authorUrn.substring(0, Math.min(12, authorUrn.length));
+    const displayEnd = authorUrn.substring(Math.max(0, authorUrn.length - 4));
+    console.log(`LINKEDIN_AUTHOR_URN input length: ${authorUrn.length} (Starts with: "${displayStart}", Ends with: "${displayEnd}")`);
+
     if (/^\d+$/.test(authorUrn)) {
       authorUrn = `urn:li:person:${authorUrn}`;
     } else if (authorUrn.startsWith('urn:li:member:')) {
