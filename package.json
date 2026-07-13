@@ -1,0 +1,18 @@
+{
+  "name": "linkedin-auto-poster",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "post": "node --env-file-if-exists=.env scripts/generate-and-post.mjs",
+    "preview": "node --env-file-if-exists=.env scripts/generate-and-post.mjs --dry-run",
+    "token": "node --env-file-if-exists=.env scripts/get-linkedin-token.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.65"
+  }
+}
