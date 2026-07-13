@@ -209,6 +209,10 @@ Output ONLY the final LinkedIn post text. Do not include any tags, preambles, ex
 
   // 3. Resolve Author
   let authorUrn = process.env.LINKEDIN_AUTHOR_URN || '';
+  if (authorUrn && !authorUrn.startsWith('urn:li:')) {
+    console.warn(`Warning: LINKEDIN_AUTHOR_URN "${authorUrn}" is not a valid LinkedIn URN format (must start with "urn:li:person:" or "urn:li:organization:"). Ignoring it to use dynamic OIDC fallback resolution.`);
+    authorUrn = '';
+  }
   let brandName = process.env.BANNER_BRAND || 'Karishma';
 
   if (orgId) {
